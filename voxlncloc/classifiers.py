@@ -1,4 +1,4 @@
-"""Tabular heads used in the manuscript (random seed 42)."""
+"""Random forest, ExtraTrees, XGBoost, LightGBM, and HistGradientBoosting (seed 42)."""
 from __future__ import annotations
 
 from typing import Any

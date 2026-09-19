@@ -1,4 +1,4 @@
-"""Official splits used in the VoxLncLoc manuscript."""
+"""Loaders for the five official VoxLncLoc splits."""
 from __future__ import annotations
 
 import json

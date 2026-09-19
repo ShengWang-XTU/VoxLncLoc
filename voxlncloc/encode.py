@@ -1,7 +1,4 @@
-"""Tetrahedral 3D-CGR density voxels (manuscript Table 2 / Eqs. 1–6).
-
-IUS length-normalization is not applied: each window already has length W = n_pts.
-"""
+"""Tetrahedral 3D-CGR density voxels."""
 from __future__ import annotations
 
 from typing import Sequence

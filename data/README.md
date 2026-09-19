@@ -1,13 +1,13 @@
-# Processed official splits
+# Data
 
-These files are the processed copies used in the VoxLncLoc manuscript. They are not a substitute for the original database licenses.
+Processed copies of the five official splits used by VoxLncLoc. Please also cite the original releases.
 
-| Folder | Contents |
+| Folder | Files |
 | --- | --- |
-| `D_LncDNN/` | `train.fasta`, `val.fasta`, `test.fasta` (seed-4370 paper split) |
+| `D_LncDNN/` | `train.fasta`, `val.fasta`, `test.fasta` |
 | `D_gShape/` | RNAlight `train.csv`, `test.csv` (tab-separated) |
-| `D_Yi/` | `table6_miller_nomiddle_balanced.csv` (n = 3402) |
+| `D_Yi/` | Miller unfiltered balanced set (`table6_miller_nomiddle_balanced.csv`, *n* = 3402) |
 | `D_MGB/` | Zenodo `Data_train.fasta`, `Data_test.fasta`, `data.csv` |
-| `D_GRASP/` | `all_samples.csv`, `meta.json`, `fold{0-4}_train_idx.npy`, `fold{0-4}_valid_idx.npy` |
+| `D_GRASP/` | `all_samples.csv`, `meta.json`, official 5-fold index files (`fold0`–`fold4`) |
 
-GRASP compartment counts in `all_samples.csv` are multi-label; unique n = 6654.
+D_GRASP is multi-label (6654 unique transcripts).

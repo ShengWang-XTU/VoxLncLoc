@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Encode a few sequences and print the voxel-vector shape."""
+"""Encode two short sequences and print the voxel-vector shape."""
 from __future__ import annotations
 
 import sys
