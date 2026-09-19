@@ -117,8 +117,7 @@ def points_to_density(points: np.ndarray, voxel_size: int = VOXEL_SIZE, sigma: f
     q = 2.0 * (p - lo) / (span + 1e-12) - 1.0
     idx = np.floor((q + 1.0) / 2.0 * (voxel_size - 1)).astype(int)
     idx = np.clip(idx, 0, voxel_size - 1)
-    for b in idx:
-        grid[tuple(b)] += 1.0
+    np.add.at(grid, (idx[:, 0], idx[:, 1], idx[:, 2]), 1.0)
     dens = np.log1p(grid)
     dens = gaussian_filter(dens, sigma=float(sigma))
     mx = float(dens.max())
@@ -146,8 +145,15 @@ def encode_voxel_matrix(
     n_pts: int,
     pca: PCA | None = None,
     fit_pca: bool = False,
+    verbose: bool = False,
 ) -> tuple[np.ndarray, PCA | None]:
-    X = np.stack([encode_one(s, n_seg, n_pts) for s in sequences], axis=0)
+    n = len(sequences)
+    rows = []
+    for i, seq in enumerate(sequences):
+        rows.append(encode_one(seq, n_seg, n_pts))
+        if verbose and ((i + 1) % 50 == 0 or i + 1 == n):
+            print(f"  3D-CGR voxels {i + 1}/{n}", flush=True)
+    X = np.stack(rows, axis=0)
     if fit_pca:
         n_comp = min(PCA_N, X.shape[0], X.shape[1])
         pca = PCA(n_components=n_comp, random_state=42)

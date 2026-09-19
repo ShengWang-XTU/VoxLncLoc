@@ -35,6 +35,20 @@ Shared on all five official splits:
 
 ## Usage
 
+The entry script is `main.py`. It trains the paper operating point on an official split and prints the corresponding metrics:
+
+```
+python main.py --dataset D_LncDNN
+python main.py --dataset D_Yi
+python main.py --dataset D_gShape
+python main.py --dataset D_MGB
+python main.py --dataset D_GRASP
+```
+
+D_LncDNN and D_Yi use the *k*-mer control only and finish relatively quickly. D_gShape, D_MGB, and D_GRASP encode 3D-CGR voxels and take longer.
+
+The encoder can also be called from Python:
+
 ```python
 from voxlncloc.datasets import load_dataset
 from voxlncloc.encode import encode_voxel_matrix
@@ -42,15 +56,8 @@ from voxlncloc.kmers import exact_kmer_matrix
 from voxlncloc.classifiers import make_classifier
 
 ds = load_dataset("D_LncDNN")
-X, pca = encode_voxel_matrix(ds.sequences, n_seg=1, n_pts=256, fit_pca=True)
 K = exact_kmer_matrix(ds.sequences, k=8)
 clf = make_classifier("et")
-```
-
-A short encoding check:
-
-```
-python scripts/example_encode.py
 ```
 
 ## Data
