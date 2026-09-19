@@ -1,0 +1,16 @@
+{
+  "n_samples": 6654,
+  "k_folds": 5,
+  "random_state": 41,
+  "min_samples": 10,
+  "locations": [
+    "Cytoplasm",
+    "Cytosol",
+    "ExtracellularVesicle",
+    "Membrane",
+    "Mitochondrion",
+    "Nucleolus",
+    "Nucleoplasm",
+    "Ribosome"
+  ]
+}
