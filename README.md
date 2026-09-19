@@ -2,7 +2,7 @@
 
 Prediction of lncRNA subcellular localization based on 3D chaos game representation voxels.
 
-Codes and processed splits for **VoxLncLoc**. The method maps lncRNA sequences to tetrahedral **3D-CGR density voxels**.
+Codes and processed splits for **VoxLncLoc**. The method maps lncRNA sequences to tetrahedral **3D-CGR occupancy voxels**.
 
 ## Requirements
 

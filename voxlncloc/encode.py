@@ -1,4 +1,4 @@
-"""Tetrahedral 3D-CGR density voxels."""
+"""Tetrahedral 3D-CGR occupancy voxels (visit-count grids, then smoothed)."""
 from __future__ import annotations
 
 from typing import Sequence
