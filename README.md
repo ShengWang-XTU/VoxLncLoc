@@ -1,6 +1,6 @@
 # VoxLncLoc
 
-Codes and processed splits for VoxLncLoc, a multi-dataset lncRNA subcellular localization method based on tetrahedral 3D-CGR density voxels. Exact *k*-mer frequencies are provided as a compositional control.
+Codes and processed splits for **VoxLncLoc**, an lncRNA subcellular localization method based on tetrahedral **3D-CGR density voxels**.
 
 ## Requirements
 
@@ -10,10 +10,11 @@ pip install -r requirements.txt
 
 Python 3.10 or later is recommended.
 
-## Encoding parameters
+## 3D-CGR voxel encoding
 
 Shared on all five official splits:
 
+- tetrahedron vertices for A/C/G/T
 - contraction scales α = {0.3, 0.5, 0.7, 0.9}
 - voxel grid *V* = 20
 - Gaussian width σ = 0.45
@@ -23,41 +24,39 @@ Shared on all five official splits:
 - window length *W* = *n_pts*
 - classifier seed 42; GRASP folds use seed 41
 
-(*S*, *n_pts*) is selected per dataset:
+Voxel grain (*S*, *n_pts*) and the tabular head used by `main.py`:
 
-| Dataset | Setting |
-| --- | --- |
-| D_LncDNN | *k* = 8, ExtraTrees |
-| D_gShape | *S* = 3, *n_pts* = 512 concatenated with *k* = 5, random forest |
-| D_Yi | *k* = 5, XGBoost (2 × 5-fold CV) |
-| D_MGB | *S* = 3, *n_pts* = 512, LightGBM |
-| D_GRASP | *S* = 1, *n_pts* = 256 concatenated with *k* = 8, ExtraTrees |
+| Dataset | *S* | *n_pts* | Head |
+| --- | --- | --- | --- |
+| D_LncDNN | 1 | 256 | ExtraTrees |
+| D_gShape | 3 | 512 | XGBoost |
+| D_Yi | 3 | 512 | XGBoost |
+| D_MGB | 3 | 512 | LightGBM |
+| D_GRASP | 1 | 256 | ExtraTrees |
 
 ## Usage
 
-The entry script is `main.py`. It trains the paper operating point on an official split and prints the corresponding metrics:
+`main.py` encodes 3D-CGR voxels and evaluates them on an official split:
 
 ```
 python main.py --dataset D_LncDNN
-python main.py --dataset D_Yi
 python main.py --dataset D_gShape
+python main.py --dataset D_Yi
 python main.py --dataset D_MGB
 python main.py --dataset D_GRASP
 ```
 
-D_LncDNN and D_Yi use the *k*-mer control only and finish relatively quickly. D_gShape, D_MGB, and D_GRASP encode 3D-CGR voxels and take longer.
-
-The encoder can also be called from Python:
+From Python:
 
 ```python
 from voxlncloc.datasets import load_dataset
 from voxlncloc.encode import encode_voxel_matrix
-from voxlncloc.kmers import exact_kmer_matrix
 from voxlncloc.classifiers import make_classifier
 
 ds = load_dataset("D_LncDNN")
-K = exact_kmer_matrix(ds.sequences, k=8)
+X, pca = encode_voxel_matrix(ds.sequences, n_seg=1, n_pts=256, fit_pca=True)
 clf = make_classifier("et")
+clf.fit(X[ds.split["train_idx"]], ds.labels[ds.split["train_idx"]])
 ```
 
 ## Data

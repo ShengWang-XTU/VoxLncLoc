@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Run VoxLncLoc on an official split (paper operating points).
+"""Run VoxLncLoc (3D-CGR voxels) on an official split.
 
 Examples
 --------
 python main.py --dataset D_LncDNN
-python main.py --dataset D_Yi
 python main.py --dataset D_gShape
+python main.py --dataset D_Yi
 python main.py --dataset D_MGB
 python main.py --dataset D_GRASP
 """
@@ -30,11 +30,11 @@ from voxlncloc.evaluate import binary_metrics, multiclass_metrics, multilabel_me
 from voxlncloc.kmers import exact_kmer_matrix
 
 CONFIG = {
-    "D_LncDNN": dict(use_voxel=False, use_kmer=True, k=8, n_seg=1, n_pts=256, head="et"),
-    "D_gShape": dict(use_voxel=True, use_kmer=True, k=5, n_seg=3, n_pts=512, head="rf"),
-    "D_Yi": dict(use_voxel=False, use_kmer=True, k=5, n_seg=3, n_pts=512, head="xgb"),
-    "D_MGB": dict(use_voxel=True, use_kmer=False, k=5, n_seg=3, n_pts=512, head="lgbm"),
-    "D_GRASP": dict(use_voxel=True, use_kmer=True, k=8, n_seg=1, n_pts=256, head="et"),
+    "D_LncDNN": dict(n_seg=1, n_pts=256, head="et", k=8),
+    "D_gShape": dict(n_seg=3, n_pts=512, head="xgb", k=5),
+    "D_Yi": dict(n_seg=3, n_pts=512, head="xgb", k=5),
+    "D_MGB": dict(n_seg=3, n_pts=512, head="lgbm", k=5),
+    "D_GRASP": dict(n_seg=1, n_pts=256, head="et", k=8),
 }
 
 PRINT_KEYS = {
@@ -125,21 +125,22 @@ def _print_row(name: str, metrics: dict, with_std: bool = False) -> None:
     print("  " + "  ".join(bits), flush=True)
 
 
-def run_dataset(name: str, *, n_jobs: int, verbose: bool) -> dict:
+def run_dataset(name: str, *, n_jobs: int, verbose: bool, with_kmer: bool) -> dict:
     cfg = CONFIG[name]
     ds = load_dataset(name)
-    print(f"[{name}] n={len(ds.sequences)} task={ds.task} head={cfg['head']}", flush=True)
-
-    Xv = None
-    if cfg["use_voxel"]:
-        print(f"  encoding voxels S={cfg['n_seg']} n_pts={cfg['n_pts']}", flush=True)
-        Xv, _ = encode_voxel_matrix(
-            ds.sequences,
-            n_seg=cfg["n_seg"],
-            n_pts=cfg["n_pts"],
-            verbose=verbose,
-        )
-    Xk = exact_kmer_matrix(ds.sequences, cfg["k"]) if cfg["use_kmer"] else None
+    print(
+        f"[{name}] 3D-CGR voxels  S={cfg['n_seg']}  n_pts={cfg['n_pts']}  head={cfg['head']}",
+        flush=True,
+    )
+    print(f"  n={len(ds.sequences)}  task={ds.task}", flush=True)
+    print(f"  encoding voxels S={cfg['n_seg']} n_pts={cfg['n_pts']}", flush=True)
+    Xv, _ = encode_voxel_matrix(
+        ds.sequences,
+        n_seg=cfg["n_seg"],
+        n_pts=cfg["n_pts"],
+        verbose=verbose,
+    )
+    Xk = exact_kmer_matrix(ds.sequences, cfg["k"]) if with_kmer else None
 
     n_class = int(np.max(ds.labels)) + 1 if ds.task == "multiclass" else 2
     split = ds.split or {}
@@ -200,7 +201,7 @@ def run_dataset(name: str, *, n_jobs: int, verbose: bool) -> dict:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="VoxLncLoc official-split evaluation")
+    parser = argparse.ArgumentParser(description="VoxLncLoc 3D-CGR voxel evaluation")
     parser.add_argument(
         "--dataset",
         required=True,
@@ -209,10 +210,15 @@ def main() -> None:
     )
     parser.add_argument("--n-jobs", type=int, default=-1)
     parser.add_argument("--quiet", action="store_true", help="less voxel-encoding progress")
+    parser.add_argument(
+        "--kmer",
+        action="store_true",
+        help=argparse.SUPPRESS,
+    )
     args = parser.parse_args()
     names = list(CONFIG) if args.dataset == "all" else [args.dataset]
     for name in names:
-        run_dataset(name, n_jobs=args.n_jobs, verbose=not args.quiet)
+        run_dataset(name, n_jobs=args.n_jobs, verbose=not args.quiet, with_kmer=args.kmer)
 
 
 if __name__ == "__main__":
